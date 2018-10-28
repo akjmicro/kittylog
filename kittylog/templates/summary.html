@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Kitty Log Summary</title>
+      <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
+      <link rel="stylesheet" href="static/bootstrap-theme.min.css">
+      <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+      <script src="static/jquery-3.3.1.min.js"></script>
+<script>
+$(document).ready(function(){
+    $(".del").click(function(event){
+        var checked = $(this).is(':checked');
+        var rowid = event.target.id;
+        if(checked) {
+            if (confirm("Delete row #" + rowid + " - are you sure?")) {
+                $("#myform").submit();
+            } else {
+            } ;
+        } else {
+            $(this).removeAttr('checked');    
+        }
+    });
+});
+</script>      
+  </head>
+<body>
+
+<div class="container">
+  <div class="row d-flex">
+    <div class="col-12">
+      <h2 class="text-center">Kitty Log Summary</h2>
+    </div>
+  </div>
+  <div class="row d-flex">
+    <div class="col-12"> 
+      <h3 class="text-center">{{ this_date }}</h2>
+    </div>
+  </div>
+  <div class="row d-flex">
+    <div class="col-12">
+      <div class="text-center" style="margin: 30px auto;">
+        <a href="/entry">MAKE AN ENTRY</a>
+      </div>
+    </div>
+  </div>
+  <form id="myform" action="/delete" method="post">
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        {% for header in headers %}
+          {% if header == 'Timestamp' %}
+          <th scope="col">{{ header }}</th>
+          {% else %}
+          <th scope="col" class="text-right">{{ header }}</th>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <th scope="row">{{ time_only(row['timestamp']) }}</th>
+        <td class="text-right">{{ row['feeder'] }}</td>
+        <td class="text-right">{{ row['kitty'] }}</td>
+        <td class="text-right">{{ row['wet'] }}</td>
+        <td class="text-right">{{ row['dry'] }}</td>
+        <td class="text-right">{{ row['hairball'] }}</td>
+        <td class="text-right">{{ row['treats'] }}</td>
+        <td class="text-right">
+            <input type="checkbox" class="del form-check-input"
+                   name="do_delete" value="{{ row['rowid'] }}"
+                   id="{{ row['rowid'] }}">
+            </input>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </form>
+  <br><hr><br>
+  
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        {% for header in sum_headers %}
+          {% if header == 'Kitty' %}
+          <th scope="col">{{ header }}</th>
+          {% else %}
+          <th scope="col" class="text-right">{{ header }}</th>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in sum_rows %}
+      <tr>
+        <th scope="row">{{ row['kitty'] }}</th>
+        <td class="text-right">{{ row['sum_wet'] }}</td>
+        <td class="text-right">{{ row['sum_dry'] }}</td>
+        <td class="text-right">{{ row['sum_hairball'] }}</td>
+        <td class="text-right">{{ row['sum_treats'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="text-center" style="margin: 30px auto;">
+    <a href="/entry">MAKE AN ENTRY</a>
+  </div>
+</div>
+<br>          
+</body>
+</html>

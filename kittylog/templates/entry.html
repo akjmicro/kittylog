@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Kitty Log</title>
+      <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
+      <link rel="stylesheet" href="static/bootstrap-theme.min.css">
+      <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+  </head>
+<body>
+
+{% macro render_field(field) %}
+  <div class="form-group col-sm-3">
+  {{ field.label }}
+  {{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    <ul class=errors>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro render_field_center(field) %}
+  <div class="col-sm-4 col-sm-offset-4 text-center">
+  {{ field.label }}
+  {{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    <ul class="errors">
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  </div>
+{% endmacro %}
+
+ 
+<div class="container">
+
+  <h2 class="text-center">Welcome to the Kitty Log!</h2>
+  <br>
+  <form action="" method="post" role="form">
+    {{ form.csrf }}
+    <div class="row">
+      {{ render_field_center(form.feeder, class="form-control") }}
+    </div>
+    <hr>
+    <!--<h2>Dos:</h2><br>-->
+    <div class="form-row" style="margin-top: 40px">
+      {{ render_field(form.Dos_wet_grams, class="form-control") }}
+      {{ render_field(form.Dos_dry_grams, class="form-control") }}
+      {{ render_field(form.Dos_hb_treats, class="form-control") }}
+      {{ render_field(form.Dos_reg_treats, class="form-control") }}
+    </div>
+    <!--<h2>Bindi:</h2><br>-->
+    <div class="form-row" style="margin-top:40px">
+      {{ render_field(form.Bindi_wet_grams, class="form-control") }}
+      {{ render_field(form.Bindi_dry_grams, class="form-control") }}
+      {{ render_field(form.Bindi_hb_treats, class="form-control") }}
+      {{ render_field(form.Bindi_reg_treats, class="form-control") }}
+    </div>
+
+    <br>
+    <div class="form-action row" style="padding: 30px 0px 0px;"> 
+      <div class="col-sm-12 text-center" style="padding: 20px 0px 0px;">
+        <button type="submit" class="btn btn-success">Submit</button>
+      </div>
+    </div>
+    <div class="row" style="padding: 40px;">
+      <div class="col-sm-12 text-center">
+        <a href='/'>VIEW SUMMARY</a>
+      </div>
+    </div>
+  </form>
+ 
+  <br>
+  
+</div>
+<br>            
+</body>
+</html>
