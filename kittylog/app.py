@@ -18,7 +18,7 @@ class ReusableForm(Form):
     )
     Dos_wet_grams = SelectField(
         'Dos wet grams', validators=[validators.required()],
-        choices=[(str(i), str(i)) for i in range(0, 60)], coerce=int,
+        choices=[(str(i), str(i)) for i in range(-20, 60)], coerce=int,
         default=0
     )
     Dos_dry_grams = SelectField(
@@ -110,10 +110,8 @@ def delete_entry_page():
     return redirect('/')
 
 
-@app.route("/tsedit", methods=['GET'])
-def tsedit():
-    id = request.args['id']
-    ts = request.args['ts']  
+@app.route("/tsedit/<id>/<ts>")
+def tsedit(id, ts):
     hour, minute = ts.split(':')
     change_timestamp(id, hour, minute)
     return redirect('/')

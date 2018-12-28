@@ -45,13 +45,13 @@ def show_sums(timestamp):
     return rv
 
 
-def write_to_log(feeder, kitty, wet, dry, hairball, treats, notes=''):
+def write_to_log(feeder, kitty, wet, dry, hairball, treats):
     timestamp = datetime.datetime.now().isoformat(' ')
     cur = get_db().execute(
         """insert into kittylog
-           (timestamp, feeder, kitty, wet, dry, hairball, treats, notes)
-           VALUES(?,?,?,?,?,?,?,?);
-        """, (timestamp, feeder, kitty, wet, dry, hairball, treats, notes)
+           (timestamp, feeder, kitty, wet, dry, hairball, treats)
+           VALUES(?,?,?,?,?,?,?);
+        """, (timestamp, feeder, kitty, wet, dry, hairball, treats)
     )
     cur.connection.commit()
     cur.close()
