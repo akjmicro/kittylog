@@ -1,8 +1,8 @@
 import datetime
 
-from flask import render_template, flash, request, redirect
-from wtforms import validators, Form, IntegerField, SelectField, SubmitField
- 
+from flask import flash, redirect, render_template, request
+from wtforms import BooleanField, Form, IntegerField, SelectField, SubmitField, validators
+
 from kittylog import *
 from kittylog.db_access import *
 
@@ -50,6 +50,7 @@ class ReusableForm(Form):
         'Bindi regular treats', validators=[validators.required()],
         choices=[(str(i), str(i)) for i in range(0, 24)], coerce=int
     )
+    water_given = BooleanField(label='<b>Fresh water was given!</b>', default='')
 
 
 @app.route("/", methods=['GET'])
@@ -64,40 +65,50 @@ def summary():
     headers = ['', 'Human', 'Kitty', 'Wet', 'Dry', '# HB', '# Reg', 'Delete?']
     rows = show_log(this_date)
     sum_headers = ['Kitty', 'Total Wet grams', 'Total Dry grams',
-                   'Total Hairball treats', 'Total Regular treats'] 
+                   'Total Hairball treats', 'Total Regular treats']
     sum_rows = show_sums(this_date)
-    return render_template('summary.html',
-                           headers = headers,
-                           rows=rows,
-                           sum_headers=sum_headers,
-                           sum_rows=sum_rows,
-                           this_date=this_date,
-                           time_only=time_only)
+    water_info = show_water(this_date)[0]
+    water_timestamp = water_info['timestamp']
+    water_feeder = water_info['feeder']
+    return render_template(
+        'summary.html',
+         headers=headers,
+         rows=rows,
+         sum_headers=sum_headers,
+         sum_rows=sum_rows,
+         this_date=this_date,
+         time_only=time_only,
+         water_timestamp=water_timestamp,
+         water_feeder=water_feeder
+    )
 
 
 @app.route("/entry", methods=['GET', 'POST'])
 def entry():
-    form = ReusableForm(request.form) 
+    form = ReusableForm(request.form)
     if request.method == 'POST' and form.validate:
         nowtime = datetime.datetime.now().isoformat(' ')
         # save the info to the db
         if any([form.Dos_wet_grams.data, form.Dos_dry_grams.data,
                 form.Dos_hb_treats.data, form.Dos_reg_treats.data]):
-            write_to_log(form.feeder.data,
-                         'Dos',
-                         form.Dos_wet_grams.data, form.Dos_dry_grams.data,
-                         form.Dos_hb_treats.data, form.Dos_reg_treats.data
-        )
+            write_to_food_log(
+                form.feeder.data,
+                'Dos',
+                form.Dos_wet_grams.data, form.Dos_dry_grams.data,
+                form.Dos_hb_treats.data, form.Dos_reg_treats.data
+            )
         if any([form.Bindi_wet_grams.data, form.Bindi_dry_grams.data,
                 form.Bindi_hb_treats.data, form.Bindi_reg_treats.data]):
-            write_to_log(form.feeder.data,
-                         'Bindi',
-                         form.Bindi_wet_grams.data, form.Bindi_dry_grams.data,
-                         form.Bindi_hb_treats.data, form.Bindi_reg_treats.data
-        )
-        
+            write_to_food_log(
+                form.feeder.data,
+                'Bindi',
+                form.Bindi_wet_grams.data, form.Bindi_dry_grams.data,
+                form.Bindi_hb_treats.data, form.Bindi_reg_treats.data
+            )
+        if form.water_given.data:
+            write_to_water_log(form.feeder.data)
         return redirect('/')
- 
+
     return render_template('entry.html', form=form)
 
 

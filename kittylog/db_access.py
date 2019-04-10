@@ -16,10 +16,11 @@ def get_db():
 
 def show_log(timestamp):
     cur = get_db().execute(
-        """select rowid, * from kittylog
-           where timestamp > date(?)
-           and timestamp < date(?, '+1 day')
-           order by timestamp desc, kitty desc;
+        """SELECT rowid, *
+           FROM food
+           WHERE timestamp > date(?)
+           AND timestamp < date(?, '+1 day')
+           ORDER BY timestamp desc, kitty DESC;
         """, (timestamp, timestamp,)
     )
     rv = cur.fetchall()
@@ -29,15 +30,15 @@ def show_log(timestamp):
 
 def show_sums(timestamp):
     cur = get_db().execute(
-        """select kitty,
+        """SELECT kitty,
                   sum(wet) as sum_wet,
                   sum(dry) as sum_dry,
                   sum(hairball) as sum_hairball,
                   sum(treats) as sum_treats
-           from kittylog
-           where timestamp > date(?)
-           and timestamp < date(?, '+1 day')
-           group by kitty;
+           FROM food
+           WHERE timestamp > date(?)
+           AND timestamp < date(?, '+1 day')
+           GROUP BY kitty;
         """, (timestamp, timestamp,)
     )
     rv = cur.fetchall()
@@ -45,10 +46,26 @@ def show_sums(timestamp):
     return rv
 
 
-def write_to_log(feeder, kitty, wet, dry, hairball, treats):
+def show_water(timestamp):
+    cur = get_db().execute(
+        """SELECT datetime(timestamp) as timestamp, feeder
+           FROM water
+           WHERE rowid = (
+             SELECT max(rowid)
+             FROM water
+             WHERE date(timestamp) <= ?
+           )
+        """, (timestamp,)
+    )
+    rv = cur.fetchall()
+    cur.close()
+    return rv
+
+
+def write_to_food_log(feeder, kitty, wet, dry, hairball, treats):
     timestamp = datetime.datetime.now().isoformat(' ')
     cur = get_db().execute(
-        """insert into kittylog
+        """INSERT INTO food
            (timestamp, feeder, kitty, wet, dry, hairball, treats)
            VALUES(?,?,?,?,?,?,?);
         """, (timestamp, feeder, kitty, wet, dry, hairball, treats)
@@ -57,9 +74,21 @@ def write_to_log(feeder, kitty, wet, dry, hairball, treats):
     cur.close()
 
 
+def write_to_water_log(feeder):
+    timestamp = datetime.datetime.now().isoformat(' ')
+    cur = get_db().execute(
+        """INSERT INTO water
+           (timestamp, feeder)
+           VALUES(?,?);
+        """, (timestamp, feeder)
+    )
+    cur.connection.commit()
+    cur.close()
+
+
 def delete_entry(rowid):
     cur = get_db().execute(
-        """delete from kittylog where rowid=?;""", (rowid,)
+        """DELETE FROM food WHERE rowid=?;""", (rowid,)
     )
     cur.connection.commit()
     cur.close()
@@ -67,17 +96,17 @@ def delete_entry(rowid):
 
 def change_timestamp(rowid, hour, minute):
     cur = get_db().execute(
-        """select timestamp from kittylog where rowid=?;""", (rowid,)
+        """SELECT timestamp FROM food WHERE rowid=?;""", (rowid,)
     )
     try:
         my_ts = cur.fetchone()['timestamp']
     except:
-        return        
+        return
     the_day, the_time = my_ts.split()
     hr, mn, sec = the_time.split(':')
     new_time = the_day + ' ' + hour + ':' + minute + ':' + sec
     cur2 = get_db().execute(
-        """update kittylog set timestamp=? where rowid=?""", (new_time, rowid,)
+        """UPDATE food SET timestamp=? WHERE rowid=?""", (new_time, rowid,)
     )
     cur2.connection.commit()
     cur2.close()

@@ -43,6 +43,43 @@ $(document).ready(function(){
       </div>
     </div>
   </div>
+  <div class="row d-flex">
+    <div class="col-12">
+      <div class="text-center" style="margin: 30px auto;">
+        <h4 class="text-center">Fresh water last given on
+        {{ water_timestamp }} by {{ water_feeder }}
+        </h4>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        {% for header in sum_headers %}
+          {% if header == 'Kitty' %}
+          <th scope="col">{{ header }}</th>
+          {% else %}
+          <th scope="col" class="text-right">{{ header }}</th>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in sum_rows %}
+      <tr>
+        <th scope="row">{{ row['kitty'] }}</th>
+        <td class="text-right">{{ row['sum_wet'] }}</td>
+        <td class="text-right">{{ row['sum_dry'] }}</td>
+        <td class="text-right">{{ row['sum_hairball'] }}</td>
+        <td class="text-right">{{ row['sum_treats'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <br><hr><br>
+  
   <form id="myform" action="/delete" method="post">
   <table class="table table-sm">
     <thead>
@@ -74,35 +111,11 @@ $(document).ready(function(){
         </td>
       </tr>
       {% endfor %}
+
     </tbody>
   </table>
   </form>
-  <br><hr><br>
-  
-  <table class="table table-sm">
-    <thead>
-      <tr>
-        {% for header in sum_headers %}
-          {% if header == 'Kitty' %}
-          <th scope="col">{{ header }}</th>
-          {% else %}
-          <th scope="col" class="text-right">{{ header }}</th>
-          {% endif %}
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in sum_rows %}
-      <tr>
-        <th scope="row">{{ row['kitty'] }}</th>
-        <td class="text-right">{{ row['sum_wet'] }}</td>
-        <td class="text-right">{{ row['sum_dry'] }}</td>
-        <td class="text-right">{{ row['sum_hairball'] }}</td>
-        <td class="text-right">{{ row['sum_treats'] }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
   <div class="text-center" style="margin: 30px auto;">
     <a href="/entry">MAKE AN ENTRY</a>
   </div>
