@@ -63,10 +63,10 @@ def summary():
     else:
         this_date = datetime.date.today().isoformat()
     headers = ['', 'Human', 'Kitty', 'Wet', 'Dry', '# HB', '# Reg', 'Delete?']
-    rows = show_log(this_date)
+    rows = show_food(this_date)
     sum_headers = ['Kitty', 'Total Wet grams', 'Total Dry grams',
                    'Total Hairball treats', 'Total Regular treats']
-    sum_rows = show_sums(this_date)
+    sum_rows = show_food_sums(this_date)
     water_info = show_water(this_date)[0]
     water_timestamp = water_info['timestamp']
     water_feeder = water_info['feeder']

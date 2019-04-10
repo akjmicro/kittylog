@@ -14,7 +14,7 @@ def get_db():
     return db
 
 
-def show_log(timestamp):
+def show_food(timestamp):
     cur = get_db().execute(
         """SELECT rowid, *
            FROM food
@@ -28,7 +28,7 @@ def show_log(timestamp):
     return rv
 
 
-def show_sums(timestamp):
+def show_food_sums(timestamp):
     cur = get_db().execute(
         """SELECT kitty,
                   sum(wet) as sum_wet,
