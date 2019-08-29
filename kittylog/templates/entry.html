@@ -47,20 +47,14 @@
     </div>
     <hr>
     <!--<h2>Dos:</h2><br>-->
-    <div class="form-row" style="margin-top:40px;">
-      {{ render_field(form.Dos_wet_grams, class="form-control") }}
-      {{ render_field(form.Dos_dry_grams, class="form-control") }}
-      {{ render_field(form.Dos_hb_treats, class="form-control") }}
-      {{ render_field(form.Dos_reg_treats, class="form-control") }}
-    </div>
-    <!--<h2>Bindi:</h2><br>-->
-    <div class="form-row" style="margin-top:40px; margin-bottom:40px;">
-      {{ render_field(form.Bindi_wet_grams, class="form-control") }}
-      {{ render_field(form.Bindi_dry_grams, class="form-control") }}
-      {{ render_field(form.Bindi_hb_treats, class="form-control") }}
-      {{ render_field(form.Bindi_reg_treats, class="form-control") }}
-    </div>
-    <div class="row" style="margin-top:40px;">
+    {% for cat in cats %}
+      <div class="form-row" style="margin-top:40px;">
+        {% for fld in fldnames %}
+          {{ render_field(getattr(form, cat + fld), class="form-control") }}
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <div class="row" style="margin-top:80px;">
       <div class="col-sm-4 col-sm-offset-4 text-center">
           {{ form.water_given() }}
           {{ form.water_given.label(class="checkbox-inline") }}

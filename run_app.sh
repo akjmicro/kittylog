@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # kill any previous
-pkill -KILL -f flask
+pkill -KILL -f gunicorn
 
-# rerun
-FLASK_APP=kittylog/app.py python3 -m flask run --host=0.0.0.0 > app.log 2>&1 &
+# run a gunicorn instance to serve the app:
+source bin/activate
+gunicorn -w 24 -b unix:kittylog.sock kittylog.wsgi:app > app.log 2>&1 &
