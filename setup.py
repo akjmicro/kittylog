@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name='kittylog',
-    version='0.1',
+    version='1.0',
     description='Food log for the kitties',
-    # url='http://github.com/akjmicro/kittylog',
+    url='http://github.com/akjmicro/kittylog',
     author='Aaron Krister Johnson',
     author_email='akjmicro@gmail.com',
     license='MIT',
@@ -13,6 +13,7 @@ setup(
     install_requires=[
         "pyyaml",
         "flask",
-        "wtforms"
+        "wtforms",
+        "gunicorn"
     ]
 )
