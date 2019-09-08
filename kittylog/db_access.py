@@ -19,9 +19,11 @@ def show_food(timestamp):
     cur = get_db().execute(
         """SELECT rowid, *
            FROM food
-           WHERE timestamp > date(?)
-           AND timestamp < date(?, '+1 day')
-           ORDER BY timestamp desc, kitty DESC;
+           WHERE timestamp BETWEEN
+             date(?)
+           AND
+             date(?, '+1 day')
+           ORDER BY time(timestamp) DESC;
         """,
         (timestamp, timestamp),
     )
@@ -36,7 +38,7 @@ def show_food_sums(timestamp):
                   sum(wet) as sum_wet,
                   sum(dry) as sum_dry,
                   sum(hairball) as sum_hairball,
-                  sum(treats) as sum_treats
+                  sum(regular) as sum_regular
            FROM food
            WHERE timestamp > date(?)
            AND timestamp < date(?, '+1 day')
@@ -51,7 +53,7 @@ def show_food_sums(timestamp):
 
 def show_water(ts):
     cur = get_db().execute(
-        """SELECT datetime(timestamp) as timestamp, feeder
+        """SELECT datetime(timestamp) as timestamp, human
            FROM water
            WHERE rowid = (
              SELECT max(rowid)
@@ -66,27 +68,27 @@ def show_water(ts):
     return rv
 
 
-def write_to_food_log(feeder, kitty, wet, dry, hairball, treats):
+def write_to_food_log(human, kitty, wet, dry, hairball, regular):
     timestamp = datetime.datetime.now().isoformat(" ")
     cur = get_db().execute(
         """INSERT INTO food
-           (timestamp, feeder, kitty, wet, dry, hairball, treats)
+           (timestamp, human, kitty, wet, dry, hairball, regular)
            VALUES(?,?,?,?,?,?,?);
         """,
-        (timestamp, feeder, kitty, wet, dry, hairball, treats),
+        (timestamp, human, kitty, wet, dry, hairball, regular),
     )
     cur.connection.commit()
     cur.close()
 
 
-def write_to_water_log(feeder):
+def write_to_water_log(human):
     timestamp = datetime.datetime.now().isoformat(" ")
     cur = get_db().execute(
         """INSERT INTO water
-           (timestamp, feeder)
+           (timestamp, human)
            VALUES(?,?);
         """,
-        (timestamp, feeder),
+        (timestamp, human),
     )
     cur.connection.commit()
     cur.close()

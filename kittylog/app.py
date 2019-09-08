@@ -48,7 +48,7 @@ class ReusableForm(Form):
     pass
 
 
-ReusableForm.feeder = SelectField(
+ReusableForm.human = SelectField(
     "Human in charge", choices=[(h, h) for h in _config["humans"]]
 )
 
@@ -102,7 +102,7 @@ def summary():
     sum_rows = show_food_sums(this_date)
     water_info = show_water(this_date)[0]
     water_timestamp = water_info["timestamp"]
-    water_feeder = water_info["feeder"]
+    water_human = water_info["human"]
     return render_template(
         "summary.html",
         headers=headers,
@@ -112,7 +112,7 @@ def summary():
         this_date=this_date,
         time_only=time_only,
         water_timestamp=water_timestamp,
-        water_feeder=water_feeder,
+        water_human=water_human,
     )
 
 
@@ -125,9 +125,9 @@ def entry():
         for cat in cats:
             attrs_to_check = [getattr(form, cat + fld).data for fld in fldnames]
             if any(attrs_to_check):
-                write_to_food_log(form.feeder.data, cat, *attrs_to_check)
+                write_to_food_log(form.human.data, cat, *attrs_to_check)
         if form.water_given.data:
-            write_to_water_log(form.feeder.data)
+            write_to_water_log(form.human.data)
         return redirect("/")
 
     return render_template(

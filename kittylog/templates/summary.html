@@ -47,7 +47,7 @@ $(document).ready(function(){
     <div class="col-12">
       <div class="text-center" style="margin: 15px auto;">
         <h4 class="text-center">Fresh water last given on
-        {{ water_timestamp }} by {{ water_feeder }}
+        {{ water_timestamp }} by {{ water_human }}
         </h4>
       </div>
     </div>
@@ -72,7 +72,7 @@ $(document).ready(function(){
         <td class="text-right">{{ row['sum_wet'] }}</td>
         <td class="text-right">{{ row['sum_dry'] }}</td>
         <td class="text-right">{{ row['sum_hairball'] }}</td>
-        <td class="text-right">{{ row['sum_treats'] }}</td>
+        <td class="text-right">{{ row['sum_regular'] }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -97,12 +97,12 @@ $(document).ready(function(){
       {% for row in rows %}
       <tr>
         <th scope="row">{{ time_only(row['timestamp']) }}</th>
-        <td class="text-right">{{ row['feeder'] }}</td>
+        <td class="text-right">{{ row['human'] }}</td>
         <td class="text-right">{{ row['kitty'] }}</td>
         <td class="text-right">{{ row['wet'] }}</td>
         <td class="text-right">{{ row['dry'] }}</td>
         <td class="text-right">{{ row['hairball'] }}</td>
-        <td class="text-right">{{ row['treats'] }}</td>
+        <td class="text-right">{{ row['regular'] }}</td>
         <td class="text-right">
             <input type="checkbox" class="del form-check-input"
                    name="do_delete" value="{{ row['rowid'] }}"
