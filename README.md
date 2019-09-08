@@ -6,8 +6,9 @@ At our place, we serve this via a Rasperry Pi 3.
 # Quick start
 * install `python3` and `flask`
 * `python3 setup.py develop`
-* From the code root directory: `chmod 777 setup_db.sh run_app.sh`
 * change the names of your cats and humans to reflect your household in the `config.yml` file
+* From the code root directory: `chmod 777 setup_db.sh run_app.sh`
+* Run the db setup script: `./setup_db.sh`
 * Set up `nginx` to serve local apps from port 80 and redirect to the
   `kittylog` process. E.G., in `/etc/nginx/sites-enabled`:
   ```
