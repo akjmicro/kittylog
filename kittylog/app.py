@@ -2,7 +2,7 @@ import datetime
 from itertools import product
 
 import yaml
-from flask import flash, redirect, render_template, request
+from flask import current_app, flash, redirect, render_template, request
 from wtforms import (
     BooleanField,
     Form,
@@ -90,6 +90,7 @@ def summary():
         ).isoformat()
     else:
         this_date = datetime.date.today().isoformat()
+    current_app.logger.info("Calculating db data...")
     headers = ["", "Human", "Kitty", "Wet", "Dry", "# HB", "# Reg", "Delete?"]
     rows = show_food(this_date)
     sum_headers = [
@@ -103,6 +104,7 @@ def summary():
     water_info = show_water(this_date)[0]
     water_timestamp = water_info["timestamp"]
     water_human = water_info["human"]
+    current_app.logger.info("Rendering summary...")
     return render_template(
         "summary.html",
         headers=headers,
@@ -118,6 +120,7 @@ def summary():
 
 @app.route("/entry", methods=["GET", "POST"])
 def entry():
+    current_app.logger.info("In 'entry' view code")
     form = ReusableForm(request.form)
     if request.method == "POST" and form.validate:
         nowtime = datetime.datetime.now().isoformat(" ")
@@ -130,6 +133,7 @@ def entry():
             write_to_water_log(form.human.data)
         return redirect("/")
 
+    current_app.logger.info("Rendering 'entry' template")
     return render_template(
         "entry.html", form=form, cats=cats, fldnames=fldnames, getattr=getattr
     )
@@ -151,5 +155,5 @@ def tsedit(id, ts):
     return redirect("/")
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+#if __name__ == "__main__":
+#    app.run(host="0.0.0.0", port=5000)
