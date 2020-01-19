@@ -2,7 +2,7 @@ import datetime
 from itertools import product
 
 import yaml
-from flask import current_app, flash, redirect, render_template, request
+from flask import current_app, flash, json, redirect, render_template, request
 from wtforms import (
     BooleanField,
     Form,
@@ -14,14 +14,17 @@ from wtforms import (
 
 from kittylog import app
 from kittylog.db_access import (
+    change_timestamp,
+    delete_entry,
     get_db,
+    get_dry_food_data,
+    get_wet_food_data,
     show_food,
     show_food_sums,
+    show_human_feeder_stats,
     show_water,
     write_to_food_log,
     write_to_water_log,
-    delete_entry,
-    change_timestamp,
 )
 
 
@@ -90,7 +93,6 @@ def summary():
         ).isoformat()
     else:
         this_date = datetime.date.today().isoformat()
-    current_app.logger.info("Calculating db data...")
     headers = ["", "Human", "Kitty", "Wet", "Dry", "# HB", "# Reg", "Delete?"]
     rows = show_food(this_date)
     sum_headers = [
@@ -104,7 +106,6 @@ def summary():
     water_info = show_water(this_date)[0]
     water_timestamp = water_info["timestamp"]
     water_human = water_info["human"]
-    current_app.logger.info("Rendering summary...")
     return render_template(
         "summary.html",
         headers=headers,
@@ -155,5 +156,47 @@ def tsedit(id, ts):
     return redirect("/")
 
 
-#if __name__ == "__main__":
-#    app.run(host="0.0.0.0", port=5000)
+#####################
+# statistcal views: #
+#####################
+
+
+@app.route("/stats")
+def graphs():
+    rows = show_human_feeder_stats()
+    humans = [str(r["human"]) for r in rows]
+    counts = [int(r["count"]) for r in rows]
+    dos_wet_data = get_wet_food_data("Dos")
+    bindi_wet_data = get_wet_food_data("Bindi")
+    dos_dry_data = get_dry_food_data("Dos")
+    bindi_dry_data = get_dry_food_data("Bindi")
+    # turn into template-usable json:
+    dos_wet_data_json = (
+        json.dumps([{"x": i["date"], "y": int(i["sum_wet"])} for i in dos_wet_data])
+        .replace('"x"', "x")
+        .replace('"y"', "y")
+    )
+    bindi_wet_data_json = (
+        json.dumps([{"x": i["date"], "y": int(i["sum_wet"])} for i in bindi_wet_data])
+        .replace('"x"', "x")
+        .replace('"y"', "y")
+    )
+    dos_dry_data_json = (
+        json.dumps([{"x": i["date"], "y": int(i["sum_dry"])} for i in dos_dry_data])
+        .replace('"x"', "x")
+        .replace('"y"', "y")
+    )
+    bindi_dry_data_json = (
+        json.dumps([{"x": i["date"], "y": int(i["sum_dry"])} for i in bindi_dry_data])
+        .replace('"x"', "x")
+        .replace('"y"', "y")
+    )
+    return render_template(
+        "stats.html",
+        Dos_wet_data=dos_wet_data_json,
+        Bindi_wet_data=bindi_wet_data_json,
+        Dos_dry_data=dos_dry_data_json,
+        Bindi_dry_data=bindi_dry_data_json,
+        humans=humans,
+        counts=counts,
+    )

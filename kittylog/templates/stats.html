@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Kitty Log Statistics!</title>
+      <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
+      <link rel="stylesheet" href="static/bootstrap-theme.min.css">
+      <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+      <script src="static/jquery-3.3.1.min.js"></script>
+      <script src="static/chart.bundle.min.js"></script>
+<style>
+.chartjs-wrapper canvas {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+</style>      
+  </head>
+
+<body>
+
+<div class="container">
+  <br>
+  <div class="row d-flex">
+    <div class="col-12">
+      <h2 class="text-center">Kitty Log <i>Statistics</i></h2>
+    </div>
+  </div>
+
+  <div style="width:100%;">
+      <canvas id="canvas"></canvas>
+  </div>
+  <script>
+      var config = {
+          type: 'line',
+          data: {
+              datasets: [
+                {
+                  label: 'Dos wet food',
+                  fill: false,
+                  backgroundColor: "white",
+                  borderColor: "rgb(72, 36, 0)",
+                  data: {{ Dos_wet_data | safe }},
+                },
+                {
+                  label: 'Bindi wet food',
+                  fill: false,
+                  backgroundColor: "white",
+                  borderColor: "grey",
+                  data: {{ Bindi_wet_data | safe }},
+                },
+                {
+                  label: 'Dos dry food',
+                  fill: false,
+                  backgroundColor: "white",
+                  borderColor: "rgb(72, 36, 0)",
+                  borderDash: [5, 5],
+                  data: {{ Dos_dry_data | safe }},
+                },
+                {
+                  label: 'Bindi dry food',
+                  fill: false,
+                  backgroundColor: "white",
+                  borderColor: "grey",
+                  borderDash: [5, 5],
+                  data: {{ Bindi_dry_data | safe }},
+                }, 
+              ]
+          },
+          options: {
+              responsive: true,
+              title: {
+                  display: true,
+                  text: 'Food grams vs. time'
+              },
+              /*  
+              tooltips: {
+                  mode: 'index',
+                  intersect: false,
+              },
+              hover: {
+                  mode: 'nearest',
+                  intersect: true
+              },
+              */
+              scales: {
+                  xAxes: [{
+                      type: 'time',
+                      display: true,
+                      scaleLabel: {
+                          display: true,
+                          labelString: 'Timestamp'
+                      }
+                  }],
+                  yAxes: [{
+                      display: true,
+                      scaleLabel: {
+                          display: true,
+                          labelString: 'Grams'
+                      }
+                  }]
+              }
+          }
+      };
+      window.onload = function() {
+          var ctx = document.getElementById('canvas').getContext('2d');
+          window.myLine = new Chart(ctx, config);
+      };
+  </script>
+
+  <br><br>
+
+  <div class="chartjs-wrapper">
+    <canvas id="chartjs-4" class="chartjs"
+            width="undefined" height="undefined">
+    </canvas>
+    <script>
+      new Chart(
+        document.getElementById("chartjs-4"), {
+          "type": "doughnut",
+          "data": {
+            "labels":
+              {{ humans | safe }},
+            "datasets":
+              [{"label": "Human feeder row counts",
+                "data": {{ counts }},
+                "backgroundColor": ["blue", "orange", "yellow", "purple", "red", "brown"],
+              }]
+          }
+        }
+      );
+    </script>
+  </div>
+
+  <div class="row d-flex">
+    <div class="col-12">
+      <div class="text-center" style="margin: 30px auto;">
+        <a href="/entry">MAKE AN ENTRY</a> &nbsp;|&nbsp; <a href="/">VIEW SUMMARY</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+<br>          
+
+</body>
+</html>

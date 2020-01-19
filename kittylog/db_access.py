@@ -68,6 +68,55 @@ def show_water(ts):
     return rv
 
 
+def show_human_feeder_stats():
+    cur = get_db().execute(
+        """SELECT human, count(human) as count
+           FROM food
+           WHERE human in (
+             SELECT DISTINCT(human)
+             FROM food
+           )
+           GROUP BY human
+           ORDER BY count(human) DESC;
+        """
+    )
+    rv = cur.fetchall()
+    cur.close()
+    return rv
+
+
+def get_wet_food_data(kitty):
+    cur = get_db().execute(
+        """SELECT date(timestamp) as date,
+                  sum(wet) as sum_wet
+           FROM food
+           WHERE kitty=?
+           AND timestamp >= date(current_timestamp, '-56 days')
+           GROUP BY date
+        """,
+        (kitty,),
+    )
+    rv = cur.fetchall()
+    cur.close()
+    return rv
+
+
+def get_dry_food_data(kitty):
+    cur = get_db().execute(
+        """SELECT date(timestamp) as date,
+                  sum(dry) as sum_dry
+           FROM food
+           WHERE kitty=?
+           AND timestamp >= date(current_timestamp, '-56 days')
+           GROUP BY date
+        """,
+        (kitty,),
+    )
+    rv = cur.fetchall()
+    cur.close()
+    return rv
+
+
 def write_to_food_log(human, kitty, wet, dry, hairball, regular):
     timestamp = datetime.datetime.now().isoformat(" ")
     cur = get_db().execute(

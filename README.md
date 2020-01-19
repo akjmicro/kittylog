@@ -13,6 +13,10 @@ At our place, we serve this via a Rasperry Pi 3.
 * Go to the IP of the server on your local network, and see the app, e.g. enter `ip_of_host:5000` into your browser URL bar
 * If so inclined, you can set up `nginx` to proxy-serve standard `port 80` requests to your server to the `flask` 'kittylog' process. It's really overkill, though.
 
+# TODO:
+* dynamic creation of statistics, driven from YAML config.
+  ATM, the newer `stats` page is hard-coded for my cats, which isn't ideal.
+
 That's it!
 
 Email questions to akjmicro@gmail.com
