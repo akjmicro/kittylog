@@ -91,7 +91,7 @@ def get_wet_food_data(kitty):
                   sum(wet) as sum_wet
            FROM food
            WHERE kitty=?
-           AND timestamp >= date(current_timestamp, '-56 days')
+           AND timestamp >= date(current_timestamp, '-28 days')
            GROUP BY date
         """,
         (kitty,),
@@ -107,7 +107,7 @@ def get_dry_food_data(kitty):
                   sum(dry) as sum_dry
            FROM food
            WHERE kitty=?
-           AND timestamp >= date(current_timestamp, '-56 days')
+           AND timestamp >= date(current_timestamp, '-28 days')
            GROUP BY date
         """,
         (kitty,),
