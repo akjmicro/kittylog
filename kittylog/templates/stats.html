@@ -34,8 +34,10 @@
     </div>
   </div>
 
-  <div style="width:100%;">
-      <canvas id="canvas"></canvas>
+  <div class="chartjs-wrapper">
+      <canvas id="canvas" class="chartjs"
+              width="undefined" height="undefined">
+      </canvas>
   </div>
   <script>
       var config = {
@@ -75,7 +77,7 @@
               ]
           },
           options: {
-              responsive: true,
+              /* responsive: true, */
               title: {
                   display: true,
                   text: 'Food grams vs. time'

@@ -70,14 +70,20 @@ def show_water(ts):
 
 def show_human_feeder_stats():
     cur = get_db().execute(
-        """SELECT human, count(human) as count
-           FROM food
-           WHERE human in (
-             SELECT DISTINCT(human)
+        """SELECT foodsum.human AS human,
+                  (watersum.count + foodsum.count) AS count
+           FROM (
+             SELECT human, COUNT(human) AS count
              FROM food
-           )
-           GROUP BY human
-           ORDER BY count(human) DESC;
+             GROUP BY human
+           ) AS foodsum
+             JOIN (
+               SELECT human, COUNT(human) AS count
+               FROM water
+               GROUP BY human
+             ) AS watersum
+             ON foodsum.human = watersum.human
+           ORDER BY count desc;
         """
     )
     rv = cur.fetchall()
