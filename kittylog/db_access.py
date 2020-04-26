@@ -124,7 +124,7 @@ def get_dry_food_data(kitty):
 
 
 def write_to_food_log(human, kitty, wet, dry, hairball, regular):
-    timestamp = datetime.datetime.now().isoformat(" ")
+    timestamp = datetime.datetime.now().isoformat(" ").split('.')[0]
     cur = get_db().execute(
         """INSERT INTO food
            (timestamp, human, kitty, wet, dry, hairball, regular)
@@ -137,7 +137,7 @@ def write_to_food_log(human, kitty, wet, dry, hairball, regular):
 
 
 def write_to_water_log(human):
-    timestamp = datetime.datetime.now().isoformat(" ")
+    timestamp = datetime.datetime.now().isoformat(" ").split('.')[0]
     cur = get_db().execute(
         """INSERT INTO water
            (timestamp, human)
