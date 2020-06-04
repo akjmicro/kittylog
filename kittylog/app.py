@@ -106,6 +106,12 @@ def summary():
     water_info = show_water(this_date)[0]
     water_timestamp = water_info["timestamp"]
     water_human = water_info["human"]
+    last_water = (
+        datetime.datetime.now()
+        - datetime.datetime.fromisoformat(water_timestamp)
+    )
+    last_water_secs = last_water.days * 86400 + last_water.seconds
+    water_color = "red" if last_water_secs > 86400 else "black"
     return render_template(
         "summary.html",
         headers=headers,
@@ -116,6 +122,7 @@ def summary():
         time_only=time_only,
         water_timestamp=water_timestamp,
         water_human=water_human,
+        water_color=water_color,
     )
 
 

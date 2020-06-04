@@ -15,13 +15,12 @@ cats:
     reg_range: 24
   Bindi:
     magic_numbers:
+      - 13
+      - 17
+      - 19
       - 23
       - 29
       - 31
-      - 37
-      - 41
-      - 17
-      - 19
     wet_range: 54
     dry_range: 54
     hb_range: 13
