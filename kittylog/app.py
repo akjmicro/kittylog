@@ -81,7 +81,7 @@ for cat, food_attr in product(_config["cats"].items(), FOOD_ATTRS.items()):
         ),
     )
 ReusableForm.water_given = BooleanField(
-    label="<b>Fresh water was given!</b>", default=""
+    label="Fresh water was given!", default=""
 )
 
 

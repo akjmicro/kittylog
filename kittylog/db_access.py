@@ -110,7 +110,7 @@ def get_wet_food_data(kitty):
 def get_dry_food_data(kitty):
     cur = get_db().execute(
         """SELECT date(timestamp) as date,
-                  sum(dry) as sum_dry
+                  round(sum(dry) + (sum(regular) / 5.0)) as sum_dry
            FROM food
            WHERE kitty=?
            AND timestamp >= date(current_timestamp, '-28 days')
