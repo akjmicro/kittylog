@@ -4,15 +4,6 @@ humans:
   - Annika
   - Sarah
 cats:
-  Dos:
-    magic_numbers:
-      - 47
-      - 43
-      - 31
-    wet_range: 54
-    dry_range: 54
-    hb_range: 13
-    reg_range: 24
   Bindi:
     magic_numbers:
       - 13

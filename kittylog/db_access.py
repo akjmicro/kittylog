@@ -91,13 +91,18 @@ def show_human_feeder_stats():
     return rv
 
 
-def get_wet_food_data(kitty):
+def get_wet_food_data(kitty, offset=0):
+    offset_min = (offset + 1) * -28
+    offset_max = (offset * -28) + 1
     cur = get_db().execute(
-        """SELECT date(timestamp) as date,
+        f"""SELECT date(timestamp) as date,
                   sum(wet) as sum_wet
            FROM food
            WHERE kitty=?
-           AND timestamp >= date(current_timestamp, '-28 days')
+           AND timestamp BETWEEN
+             date(current_timestamp, '{offset_min} days')
+             AND
+             date(current_timestamp, '{offset_max} days')
            GROUP BY date
         """,
         (kitty,),
@@ -107,13 +112,18 @@ def get_wet_food_data(kitty):
     return rv
 
 
-def get_dry_food_data(kitty):
+def get_dry_food_data(kitty, offset=0):
+    offset_min = (offset + 1) * -28
+    offset_max = (offset * -28) + 1
     cur = get_db().execute(
-        """SELECT date(timestamp) as date,
+        f"""SELECT date(timestamp) as date,
                   round(sum(dry) + (sum(regular) / 5.0)) as sum_dry
            FROM food
            WHERE kitty=?
-           AND timestamp >= date(current_timestamp, '-28 days')
+           AND timestamp BETWEEN
+             date(current_timestamp, '{offset_min} days')
+             AND
+             date(current_timestamp, '{offset_max} days')
            GROUP BY date
         """,
         (kitty,),
@@ -124,7 +134,7 @@ def get_dry_food_data(kitty):
 
 
 def write_to_food_log(human, kitty, wet, dry, hairball, regular):
-    timestamp = datetime.datetime.now().isoformat(" ").split('.')[0]
+    timestamp = datetime.datetime.now().isoformat(" ").split(".")[0]
     cur = get_db().execute(
         """INSERT INTO food
            (timestamp, human, kitty, wet, dry, hairball, regular)
@@ -137,7 +147,7 @@ def write_to_food_log(human, kitty, wet, dry, hairball, regular):
 
 
 def write_to_water_log(human):
-    timestamp = datetime.datetime.now().isoformat(" ").split('.')[0]
+    timestamp = datetime.datetime.now().isoformat(" ").split(".")[0]
     cur = get_db().execute(
         """INSERT INTO water
            (timestamp, human)

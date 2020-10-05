@@ -80,9 +80,7 @@ for cat, food_attr in product(_config["cats"].items(), FOOD_ATTRS.items()):
             coerce=int,
         ),
     )
-ReusableForm.water_given = BooleanField(
-    label="Fresh water was given!", default=""
-)
+ReusableForm.water_given = BooleanField(label="Fresh water was given!", default="")
 
 
 @app.route("/", methods=["GET"])
@@ -106,9 +104,8 @@ def summary():
     water_info = show_water(this_date)[0]
     water_timestamp = water_info["timestamp"]
     water_human = water_info["human"]
-    last_water = (
-        datetime.datetime.now()
-        - datetime.datetime.fromisoformat(water_timestamp)
+    last_water = datetime.datetime.now() - datetime.datetime.fromisoformat(
+        water_timestamp
     )
     last_water_secs = last_water.days * 86400 + last_water.seconds
     water_color = "red" if last_water_secs > 86400 else "black"
@@ -168,28 +165,18 @@ def tsedit(id, ts):
 #####################
 
 
-@app.route("/stats")
+@app.route("/stats", methods=["GET"])
 def graphs():
+    offset = request.args.get("offset", "0")
+    offset = int(offset)
     rows = show_human_feeder_stats()
     humans = [str(r["human"]) for r in rows]
     counts = [int(r["count"]) for r in rows]
-    dos_wet_data = get_wet_food_data("Dos")
-    bindi_wet_data = get_wet_food_data("Bindi")
-    dos_dry_data = get_dry_food_data("Dos")
-    bindi_dry_data = get_dry_food_data("Bindi")
+    bindi_wet_data = get_wet_food_data("Bindi", offset)
+    bindi_dry_data = get_dry_food_data("Bindi", offset)
     # turn into template-usable json:
-    dos_wet_data_json = (
-        json.dumps([{"x": i["date"], "y": int(i["sum_wet"])} for i in dos_wet_data])
-        .replace('"x"', "x")
-        .replace('"y"', "y")
-    )
     bindi_wet_data_json = (
         json.dumps([{"x": i["date"], "y": int(i["sum_wet"])} for i in bindi_wet_data])
-        .replace('"x"', "x")
-        .replace('"y"', "y")
-    )
-    dos_dry_data_json = (
-        json.dumps([{"x": i["date"], "y": int(i["sum_dry"])} for i in dos_dry_data])
         .replace('"x"', "x")
         .replace('"y"', "y")
     )
@@ -200,9 +187,7 @@ def graphs():
     )
     return render_template(
         "stats.html",
-        Dos_wet_data=dos_wet_data_json,
         Bindi_wet_data=bindi_wet_data_json,
-        Dos_dry_data=dos_dry_data_json,
         Bindi_dry_data=bindi_dry_data_json,
         humans=humans,
         counts=counts,
