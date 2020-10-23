@@ -1,8 +1,8 @@
 import datetime
-import sqlite3
+import pysqlite3 as sqlite3
 from flask import g
 
-from kittylog import app
+from kittylog import app, config
 
 DATABASE = "kittylog/kittylog.db"
 
@@ -19,13 +19,10 @@ def show_food(timestamp):
     cur = get_db().execute(
         """SELECT rowid, *
            FROM food
-           WHERE timestamp BETWEEN
-             date(?)
-           AND
-             date(?, '+1 day')
+           WHERE date(timestamp) = date(?)
            ORDER BY time(timestamp) DESC;
         """,
-        (timestamp, timestamp),
+        (timestamp,),
     )
     rv = cur.fetchall()
     cur.close()
@@ -40,11 +37,10 @@ def show_food_sums(timestamp):
                   sum(hairball) as sum_hairball,
                   sum(regular) as sum_regular
            FROM food
-           WHERE timestamp > date(?)
-           AND timestamp < date(?, '+1 day')
+           WHERE date(timestamp) = date(?)
            GROUP BY kitty;
         """,
-        (timestamp, timestamp),
+        (timestamp,),
     )
     rv = cur.fetchall()
     cur.close()
@@ -91,15 +87,23 @@ def show_human_feeder_stats():
     return rv
 
 
-def get_wet_food_data(kitty, offset=0):
+def get_calorie_data(kitty, offset=0):
     offset_min = (offset + 1) * -28
-    offset_max = (offset * -28) + 1
+    offset_max = offset * -28
+    nutrition = config["nutrition"]
+    dry_factor = nutrition["dry"]
+    wet_factor = nutrition["wet"]
+    hairball_factor = nutrition["hairball"]
+    regular_factor = nutrition["regular"]
     cur = get_db().execute(
         f"""SELECT date(timestamp) as date,
-                  sum(wet) as sum_wet
+                   (sum(dry) * {dry_factor}
+                   + sum(wet) * {wet_factor}
+                   + sum(hairball) * {hairball_factor}
+                   + sum(regular) * {regular_factor}) as calories
            FROM food
            WHERE kitty=?
-           AND timestamp BETWEEN
+           AND date(timestamp) BETWEEN
              date(current_timestamp, '{offset_min} days')
              AND
              date(current_timestamp, '{offset_max} days')
@@ -112,19 +116,36 @@ def get_wet_food_data(kitty, offset=0):
     return rv
 
 
-def get_dry_food_data(kitty, offset=0):
+def get_calorie_moving_average_data(kitty, offset=0):
     offset_min = (offset + 1) * -28
-    offset_max = (offset * -28) + 1
+    offset_max = offset * -28
+    nutrition = config["nutrition"]
+    dry_factor = nutrition["dry"]
+    wet_factor = nutrition["wet"]
+    hairball_factor = nutrition["hairball"]
+    regular_factor = nutrition["regular"]
     cur = get_db().execute(
-        f"""SELECT date(timestamp) as date,
-                  round(sum(dry) + (sum(regular) / 5.0)) as sum_dry
-           FROM food
-           WHERE kitty=?
-           AND timestamp BETWEEN
+        f"""SELECT inner.date, AVG(inner.calories)
+              OVER (ORDER BY date ASC ROWS 3 PRECEDING) AS moving_avg_7
+           FROM
+           (
+               SELECT date(timestamp) as date,
+                       (sum(dry) * {dry_factor}
+                       + sum(wet) * {wet_factor}
+                       + sum(hairball) * {hairball_factor}
+                       + sum(regular) * {regular_factor}) as calories
+               FROM food
+               WHERE kitty=?
+               AND date(timestamp) BETWEEN
+                 date(current_timestamp, '{offset_min - 6} days')
+                 AND
+                 date(current_timestamp, '{offset_max} days')
+               GROUP BY date
+           ) AS inner
+           WHERE date BETWEEN
              date(current_timestamp, '{offset_min} days')
              AND
              date(current_timestamp, '{offset_max} days')
-           GROUP BY date
         """,
         (kitty,),
     )

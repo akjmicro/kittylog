@@ -5,6 +5,7 @@ At our place, we serve this via a Rasperry Pi 3.
 
 # Quick start
 * install `python3` and `flask`
+* for the newer statistics, you want to build a new `pysqlite3` locally and install. Most distros won't have an up-to-date `sqlite3` library
 * `python3 setup.py develop`
 * change the names of your cats and humans to reflect your household in the `config.yml` file
 * From the code root directory: `chmod 777 setup_db.sh run_app.sh`

@@ -2,7 +2,6 @@ humans:
   - Aaron
   - Amy
   - Annika
-  - Sarah
 cats:
   Bindi:
     magic_numbers:
@@ -16,3 +15,8 @@ cats:
     dry_range: 54
     hb_range: 13
     reg_range: 24
+nutrition:
+  wet: 1.113
+  dry: 3.902
+  hairball: 1.24
+  regular: 1.1

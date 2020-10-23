@@ -1,7 +1,9 @@
 import logging
+import yaml
 
 from flask import Flask
 
+config = yaml.safe_load(open("config.yml"))
 
 # App config.
 DEBUG = True

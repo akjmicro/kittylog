@@ -45,27 +45,27 @@
           data: {
               datasets: [
                 {
-                  label: 'Bindi wet food',
+                  label: 'Bindi calories',
                   fill: false,
                   backgroundColor: "white",
                   borderColor: "grey",
-                  data: {{ Bindi_wet_data | safe }},
+                  data: {{ Bindi_calorie_data | safe }},
                 },
                 {
-                  label: 'Bindi dry food',
+                  label: 'Bindi 7-day moving-average calories',
                   fill: false,
                   backgroundColor: "white",
                   borderColor: "grey",
-                  borderDash: [5, 5],
-                  data: {{ Bindi_dry_data | safe }},
-                }, 
+                  borderDash: [7, 4],
+                  data: {{ Bindi_calorie_moving_average_data | safe }},
+                },
               ]
           },
           options: {
               /* responsive: true, */
               title: {
                   display: true,
-                  text: 'Food grams vs. time'
+                  text: 'Calories vs. time'
               },
               /*  
               tooltips: {

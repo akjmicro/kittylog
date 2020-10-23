@@ -1,7 +1,6 @@
 import datetime
 from itertools import product
 
-import yaml
 from flask import current_app, flash, json, redirect, render_template, request
 from wtforms import (
     BooleanField,
@@ -12,13 +11,13 @@ from wtforms import (
     validators,
 )
 
-from kittylog import app
+from kittylog import app, config
 from kittylog.db_access import (
     change_timestamp,
     delete_entry,
     get_db,
-    get_dry_food_data,
-    get_wet_food_data,
+    get_calorie_data,
+    get_calorie_moving_average_data,
     show_food,
     show_food_sums,
     show_human_feeder_stats,
@@ -26,9 +25,6 @@ from kittylog.db_access import (
     write_to_food_log,
     write_to_water_log,
 )
-
-
-_config = yaml.safe_load(open("config.yml"))
 
 
 FOOD_ATTRS = {
@@ -39,7 +35,7 @@ FOOD_ATTRS = {
 }
 
 
-cats = _config["cats"].keys()
+cats = config["cats"].keys()
 fldnames = [attr[0] for attr in FOOD_ATTRS.values()]
 
 
@@ -52,10 +48,10 @@ class ReusableForm(Form):
 
 
 ReusableForm.human = SelectField(
-    "Human in charge", choices=[(h, h) for h in _config["humans"]]
+    "Human in charge", choices=[(h, h) for h in config["humans"]]
 )
 
-for cat, food_attr in product(_config["cats"].items(), FOOD_ATTRS.items()):
+for cat, food_attr in product(config["cats"].items(), FOOD_ATTRS.items()):
     if "wet" in food_attr[0]:
         min_range = -int(cat[1]["wet_range"])
         max_range = int(cat[1]["wet_range"])
@@ -172,23 +168,28 @@ def graphs():
     rows = show_human_feeder_stats()
     humans = [str(r["human"]) for r in rows]
     counts = [int(r["count"]) for r in rows]
-    bindi_wet_data = get_wet_food_data("Bindi", offset)
-    bindi_dry_data = get_dry_food_data("Bindi", offset)
+    bindi_calorie_data = get_calorie_data("Bindi", offset)
+    bindi_calorie_moving_average_data = get_calorie_moving_average_data("Bindi", offset)
     # turn into template-usable json:
-    bindi_wet_data_json = (
-        json.dumps([{"x": i["date"], "y": int(i["sum_wet"])} for i in bindi_wet_data])
+    bindi_calorie_data_json = (
+        json.dumps([{"x": i["date"], "y": i["calories"]} for i in bindi_calorie_data])
         .replace('"x"', "x")
         .replace('"y"', "y")
     )
-    bindi_dry_data_json = (
-        json.dumps([{"x": i["date"], "y": int(i["sum_dry"])} for i in bindi_dry_data])
+    bindi_calorie_moving_average_data_json = (
+        json.dumps(
+            [
+                {"x": i["date"], "y": i["moving_avg_7"]}
+                for i in bindi_calorie_moving_average_data
+            ]
+        )
         .replace('"x"', "x")
         .replace('"y"', "y")
     )
     return render_template(
         "stats.html",
-        Bindi_wet_data=bindi_wet_data_json,
-        Bindi_dry_data=bindi_dry_data_json,
+        Bindi_calorie_data=bindi_calorie_data_json,
+        Bindi_calorie_moving_average_data=bindi_calorie_moving_average_data_json,
         humans=humans,
         counts=counts,
     )
